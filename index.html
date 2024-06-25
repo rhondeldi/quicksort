@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Sorting</title>
+    <!-- Bootstrap CSS for styling -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Internal CSS for custom styles -->
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+      }
+      .scrollable-container {
+        max-height: 60vh; /* Adjust as needed */
+        overflow-y: auto;
+        width: 100%;
+      }
+      .number-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap; /* Ensure numbers wrap within the container */
+      }
+      .number-box {
+        border: 2px solid black;
+        padding: 10px;
+        margin: 5px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Navigation bar -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
+        <a class="navbar-brand text-center w-100" href="#">QuickSort</a>
+      </nav>
+      <!-- Input field for user numbers -->
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="user-numbers"
+          placeholder="Enter numbers separated by commas (5 to 10 numbers)"
+        />
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="start-button"
+          >
+            Start Sorting
+          </button>
+        </div>
+      </div>
+      <!-- Container for sorting steps -->
+      <div
+        id="sorting-steps-container"
+        class="scrollable-container mt-4 w-100"
+      ></div>
+      <!-- Button for next step in sorting -->
+      <div class="row mt-4 w-100 justify-content-center">
+        <div class="col-12 d-flex justify-content-center">
+          <button
+            class="btn btn-primary p-3 mt-4"
+            id="next-step-button"
+            disabled
+          >
+            Next Step
+          </button>
+        </div>
+      </div>
+      <!-- Completion message displayed after sorting completes -->
+      <div id="completion-message" class="mt-4"></div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        let numbers = []; // Array to store numbers
+        let stack = []; // Stack to keep track of partitions
+        let low, high, pivot, i, j; // Variables for partitioning
+        let state = "partition"; // Initial state
+
+        // Function to render numbers in the sorting container
+        const renderNumbers = (currentNumbers) => {
+          const stepContainer = document.createElement("div");
+          stepContainer.className = "number-container";
+          currentNumbers.forEach((number, index) => {
+            const numberDiv = document.createElement("div");
+            numberDiv.className = "number-box bg-primary-subtle rounded";
+            numberDiv.id = `number-${index}`;
+            numberDiv.textContent = number;
+            // Highlight numbers based on their role in the sorting process
+            if (state === "completed") {
+              numberDiv.style.backgroundColor = "yellow";
+            } else if (index === pivot) {
+              numberDiv.style.backgroundColor = "orange";
+            } else if (index === i) {
+              numberDiv.style.backgroundColor = "green";
+            } else if (index === j) {
+              numberDiv.style.backgroundColor = "red";
+            } else {
+              numberDiv.style.backgroundColor = "";
+            }
+            stepContainer.appendChild(numberDiv);
+          });
+          const sortingStepsContainer = document.getElementById(
+            "sorting-steps-container"
+          );
+          sortingStepsContainer.appendChild(stepContainer);
+
+          // Automatically scroll to the bottom of the container
+          sortingStepsContainer.scrollTop = sortingStepsContainer.scrollHeight;
+        };
+
+        // Function to display completion message
+        const displayCompletionMessage = () => {
+          const messageDiv = document.getElementById("completion-message");
+          messageDiv.textContent = "Sorting is complete!";
+          messageDiv.className = "alert alert-success";
+        };
+
+        // Function to swap elements in an array
+        const swap = (arr, i, j) => {
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        };
+
+        // Function for the partitioning step of QuickSort
+        const partition = () => {
+          if (stack.length > 0) {
+            [low, high] = stack.pop();
+            pivot = high;
+            i = low - 1;
+            j = low;
+            state = "partitioning";
+          } else {
+            state = "completed";
+            renderNumbers([...numbers]); // Final rendering of sorted numbers
+            displayCompletionMessage(); // Display completion message
+          }
+        };
+
+        // Function to execute the next step in the sorting process
+        const nextStep = () => {
+          if (state === "partitioning") {
+            if (j < high) {
+              if (numbers[j] < numbers[pivot]) {
+                i++;
+                swap(numbers, i, j);
+              }
+              j++;
+            } else {
+              swap(numbers, i + 1, high);
+              const pi = i + 1;
+              if (pi - 1 > low) {
+                stack.push([low, pi - 1]);
+              }
+              if (pi + 1 < high) {
+                stack.push([pi + 1, high]);
+              }
+              state = "partition";
+              renderNumbers([...numbers]); // Render numbers after pivot swap
+              partition(); // Move to the next partition
+            }
+          } else if (state === "completed") {
+            console.log("Sorting completed!");
+          }
+          if (state !== "completed") {
+            renderNumbers([...numbers]);
+          }
+        };
+
+        // Function to validate and start the sorting process
+        const startSorting = () => {
+          const userNumbersInput =
+            document.getElementById("user-numbers").value;
+          const userNumbers = userNumbersInput
+            .split(",")
+            .map(Number)
+            .filter((n) => !isNaN(n));
+
+          if (userNumbers.length < 5 || userNumbers.length > 10) {
+            alert("Please enter between 5 and 10 valid numbers.");
+            return;
+          }
+
+          numbers = userNumbers;
+          stack.push([0, numbers.length - 1]); // Initialize stack with initial partition
+          renderNumbers([...numbers]); // Initial rendering of numbers
+          document.getElementById("next-step-button").disabled = false; // Enable the Next Step button
+        };
+
+        // Event listener for the Start button
+        document
+          .getElementById("start-button")
+          .addEventListener("click", startSorting);
+
+        // Event listener for the Next Step button
+        document
+          .getElementById("next-step-button")
+          .addEventListener("click", () => {
+            if (state === "partition") {
+              partition();
+            } else {
+              nextStep();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
