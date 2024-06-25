@@ -1,229 +1,558 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Number Sorting</title>
-    <!-- Bootstrap CSS for styling -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Internal CSS for custom styles -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickSort Visualization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-      body,
-      html {
-        height: 100%;
-        margin: 0;
-      }
-      .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh; /* Full viewport height */
-      }
-      .scrollable-container {
-        max-height: 60vh; /* Adjust as needed */
-        overflow-y: auto;
-        width: 100%;
-      }
-      .number-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap; /* Ensure numbers wrap within the container */
-      }
-      .number-box {
-        border: 2px solid black;
-        padding: 10px;
-        margin: 5px;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            transition: background-color 0.5s, color 0.5s;
+            overflow-x: hidden; /* Ensure no horizontal scroll */
+        }
+        body.light-mode {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode .navbar-brand {
+            color: #bb86fc;
+            text-shadow: 0 0 10px #bb86fc;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative; /* Ensure stacking context for z-index */
+            z-index: 1; /* Ensure it's above the background */
+        }
+        .scrollable-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+        .number-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .number-box {
+            border: 2px solid transparent;
+            padding: 10px;
+            margin: 5px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .bg-primary {
+            background-color: transparent !important; /* Make sure background is transparent */
+            border-color: black; /* Keep border color */
+            color: #000; /* Keep text color */
+        }
+        .bg-pivot {
+            background-color: #ff9800;
+            color: #fff;
+        }
+        .bg-i {
+            background-color: blue;
+            color: #fff;
+        }
+        .bg-j {
+            background-color: #f44336;
+            color: #fff;
+        }
+        .bg-completed {
+            background-color: #8bc34a;
+            color: #fff;
+        }
+        body.dark-mode .bg-primary {
+            border-color: white;
+            background-color: transparent;
+            color: #e0e0e0;
+        }
+        body.dark-mode .bg-pivot {
+            border-color: #ffb74d;
+            background-color: transparent;
+            box-shadow: 0 0 10px #ffb74d;
+        }
+        body.dark-mode .bg-i {
+            border-color:blue;
+            background-color: transparent;
+            box-shadow: 0 0 10px blue;
+        }
+        body.dark-mode .bg-j {
+            border-color: #e57373;
+            background-color: transparent;
+            box-shadow: 0 0 10px #e57373;
+        }
+        body.dark-mode .bg-completed {
+            border-color: #aed581;
+            background-color: transparent;
+            box-shadow: 0 0 10px #aed581;
+        }
+        .number-box.swap {
+            animation: swap 0.3s;
+        }
+        .title {
+  font-size: 200px; /* Adjust font size as needed */
+  display: inline-block; /* Allows individual letter manipulation */
+  position: relative; /* Enables letter transformations */
+}
+
+.title span {
+  display: inline-block; /* Allows individual letter positioning */
+  position: relative; /* Enables letter transformations for individual spans */
+  margin-right: 100px; /* Optional spacing between letters */
+}
+
+.title span:nth-child(odd) {
+  animation: swap-left 1s ease-in-out infinite alternate;
+}
+
+.title span:nth-child(even) {
+  animation: swap-right 1s ease-in-out infinite alternate;
+}
+
+@keyframes swap-left {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(30px); /* Adjust distance based on font size */
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes swap-right {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px); /* Adjust distance based on font size */
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.navbar-brand span {
+  display: inline-block;
+  animation: swap 0.5s infinite;
+  animation-delay: calc(var(--delay) * 0.1s); /* Delay each letter */
+  font-size: calc(1vw + 1rem); /* Responsive font size */
+  padding-bottom: 5%;
+
+  align-items: center;
+  justify-self: center;
+}
+
+
+        .toggle-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10; /* Ensure button is above galaxy background */
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .input-group {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        body.dark-mode .form-control, body.dark-mode .input-group-append .btn {
+            background-color: transparent;
+            border-color: #bb86fc;
+            color: #e0e0e0;
+            box-shadow: 0 0 10px #bb86fc;
+        }
+        body.light-mode .form-control, body.light-mode .input-group-append .btn {
+            border-color: #000;
+            box-shadow: none;
+        }
+
+        /* Animation for the title */
+        @keyframes titleAnimation {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        .navbar-brand {
+            animation: titleAnimation 2s infinite;
+        }
+        /* Galaxy background styles */
+        .galaxy-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Ensure it's behind other content */
+            background: url('') center/cover fixed;
+            transition: filter 0.5s ease; /* Smooth transition for filters */
+        }
+
+        /* Adjustments for dark mode on galaxy background */
+        body.dark-mode .galaxy-container {
+            filter: brightness(70%) contrast(130%);
+        }
+
+        /* Glowing effect animation */
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        .btn {
+            background-color: transparent;
+            transition: transform 0.5s;
+        }
+
+        .btn-glow {
+            animation: glow 4s infinite;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-secondary:focus {
+            transition: transform 0.5s;
+        }
+        #start-button {
+  color: #f0f0f0;
+  background-color: #5D3FD3;
+  border: none; /* Remove default button border */
+  font-size: 16px; /* Adjust font size for readability */
+  cursor: pointer; /* Set cursor to indicate clickability */
+  transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+}
+
+#start-button:hover {
+  background-color: #4A2BAA; /* Slightly darker shade on hover */
+  transform: scale(1.05); /* Subtle zoom effect on hover */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow on hover */
+}
+
+#start-button:active {
+  transform: scale(); /* Slight shrink effect on click */
+  box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.3); /* Inset shadow on click */
+}
+#next-step-button {
+  color: #f0f0f0;
+  background-color: #5D3FD3;
+  border: none; /* Remove default button border */
+  font-size: 16px; /* Adjust font size for readability */
+  cursor: pointer; /* Set cursor to indicate clickability */
+  transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+}
+
+#next-step-button:hover {
+  background-color: #4A2BAA; /* Slightly darker shade on hover */
+  transform: scale(1.05); /* Subtle zoom effect on hover */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow on hover */
+}
+
+#next-step-button:active {
+  transform: scale(); /* Slight shrink effect on click */
+  box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.3); /* Inset shadow on click */
+}
+        .btn-outline-secondary:hover .btn-glow {
+            animation: glow 1s infinite;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            transform: scale(1.1);
+        }
+
+        .btn-primary:hover .btn-glow {
+            animation: glow 1s infinite;
+        }
+        .moon-icon,
+        .sun-icon {
+            display: none;
+        }
+
+        .toggle-button.dark-mode .sun-icon {
+            display: inline-block;
+        }
+
+        .toggle-button.light-mode .moon-icon {
+            display: inline-block;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body class="light-mode">
+    <div class="galaxy-container"></div>
     <div class="container">
-      <!-- Navigation bar -->
-      <nav class="navbar navbar-expand-lg navbar-light bg-light w-100">
-        <a class="navbar-brand text-center w-100" href="#">QuickSort</a>
+      <nav class="navbar navbar-expand-lg navbar-light w-100">
+        <a class="navbar-brand mx-auto d-flex align-items-center">
+          <span>Q</span>
+          <span>u</span>
+          <span>i</span>
+          <span>c</span>
+          <span>k</span>
+          <span>S</span>
+          <span>o</span>
+          <span>r</span>
+          <span>t</span>
+          <span> </span>&nbsp;&nbsp;
+          <span>V</span>
+          <span>i</span>
+          <span>s</span>
+          <span>u</span>
+          <span>a</span>
+          <span>l</span>
+          <span>i</span>
+          <span>z</span>
+          <span>a</span>
+          <span>t</span>
+          <span>i</span>
+          <span>o</span>
+          <span>n</span>
+        </a>
+        
       </nav>
-      <!-- Input field for user numbers -->
-      <div class="input-group mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="user-numbers"
-          placeholder="Enter numbers separated by commas (5 to 10 numbers)"
-        />
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            id="start-button"
-          >
-            Start Sorting
-          </button>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="user-numbers" placeholder="Enter numbers separated by commas (5 to 10 numbers)"
+            oninput="validateInput()">
+   
+            <div class="input-group-append">
+                <!-- Start Sorting Button -->
+                <button class="btn btn-outline-secondary btn-glow" type="button" id="start-button">Start Sorting</button>
+            </div>
         </div>
-      </div>
-      <!-- Container for sorting steps -->
-      <div
-        id="sorting-steps-container"
-        class="scrollable-container mt-4 w-100"
-      ></div>
-      <!-- Button for next step in sorting -->
-      <div class="row mt-4 w-100 justify-content-center">
-        <div class="col-12 d-flex justify-content-center">
-          <button
-            class="btn btn-primary p-3 mt-4"
-            id="next-step-button"
-            disabled
-          >
-            Next Step
-          </button>
+
+        <!-- Container for Next Step Button -->
+        <div class="next-step-container">
+            <button class="btn btn-primary p-3 next-step-button btn-glow" id="next-step-button" style="display:none;" disabled>Next Step</button>
         </div>
-      </div>
-      <!-- Completion message displayed after sorting completes -->
-      <div id="completion-message" class="mt-4"></div>
+
+        <div id="sorting-steps-container" class="scrollable-container mt-4 w-100"></div>
+        <div class="row mt-4 w-100 justify-content-center">
+            <div class="col-12 d-flex justify-content-center">
+                <!-- Removed duplicate Next Step button here -->
+            </div>
+        </div>
+        <div id="completion-message" class="mt-4"></div>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-box bg-pivot"></div>Pivot</div>
+            <div class="legend-item"><div class="legend-box bg-i"></div>Pointer i</div>
+            <div class="legend-item"><div class="legend-box bg-j"></div>Pointer j</div>
+            <div class="legend-item"><div class="legend-box bg-completed"></div>Sorted</div>
+            <button class="dark-toggle-button far fa-moon"></button>
+          </div>
+        </div>
     </div>
+    
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        let numbers = []; // Array to store numbers
-        let stack = []; // Stack to keep track of partitions
-        let low, high, pivot, i, j; // Variables for partitioning
-        let state = "partition"; // Initial state
+        document.addEventListener("DOMContentLoaded", () => {
+            let numbers = [];
+            let stack = [];
+            let low, high, pivot, i, j;
+            let state = "partition";
 
-        // Function to render numbers in the sorting container
-        const renderNumbers = (currentNumbers) => {
-          const stepContainer = document.createElement("div");
-          stepContainer.className = "number-container";
-          currentNumbers.forEach((number, index) => {
-            const numberDiv = document.createElement("div");
-            numberDiv.className = "number-box bg-primary-subtle rounded";
-            numberDiv.id = `number-${index}`;
-            numberDiv.textContent = number;
-            // Highlight numbers based on their role in the sorting process
-            if (state === "completed") {
-              numberDiv.style.backgroundColor = "yellow";
-            } else if (index === pivot) {
-              numberDiv.style.backgroundColor = "orange";
-            } else if (index === i) {
-              numberDiv.style.backgroundColor = "green";
-            } else if (index === j) {
-              numberDiv.style.backgroundColor = "red";
-            } else {
-              numberDiv.style.backgroundColor = "";
+            const renderNumbers = (currentNumbers) => {
+                const stepContainer = document.createElement("div");
+                stepContainer.className = "number-container";
+                currentNumbers.forEach((number, index) => {
+                    const numberDiv = document.createElement("div");
+                    numberDiv.className = "number-box rounded";
+                    numberDiv.id = `number-${index}`;
+                    numberDiv.textContent = number;
+
+                    if (state === "completed") {
+                        numberDiv.classList.add("bg-completed");
+                    } else if (index === pivot) {
+                        numberDiv.classList.add("bg-pivot");
+                    } else if (index === i) {
+                        numberDiv.classList.add("bg-i");
+                    } else if (index === j) {
+                        numberDiv.classList.add("bg-j");
+                    } else {
+                        numberDiv.classList.add("bg-primary");
+                    }
+
+                    stepContainer.appendChild(numberDiv);
+                });
+                const sortingStepsContainer = document.getElementById("sorting-steps-container");
+                sortingStepsContainer.appendChild(stepContainer);
+                sortingStepsContainer.scrollTop = sortingStepsContainer.scrollHeight;
+            };
+
+            const displayCompletionMessage = () => {
+                const messageDiv = document.getElementById("completion-message");
+                messageDiv.textContent = "SORTING IS COMPLETE!";
+                messageDiv.className = "alert alert-success";
+            };
+
+            const swap = (arr, i, j) => {
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+                document.getElementById(`number-${i}`).classList.add("swap");
+                document.getElementById(`number-${j}`).classList.add("swap");
+                setTimeout(() => {
+                    document.getElementById(`number-${i}`).classList.remove("swap");
+                    document.getElementById(`number-${j}`).classList.remove("swap");
+                }, 300);
+            };
+
+            const partition = () => {
+                if (stack.length > 0) {
+                    [low, high] = stack.pop();
+                    pivot = high;
+                    i = low - 1;
+                    j = low;
+                    state = "partitioning";
+                } else {
+                    state = "completed";
+                    renderNumbers([...numbers]);
+                    displayCompletionMessage();
+                    document.getElementById("start-button").disabled = true;
+                }
+            };
+
+            const nextStep = () => {
+                if (state === "partitioning") {
+                    if (j < high) {
+                        if (numbers[j] < numbers[pivot]) {
+                            i++;
+                            swap(numbers, i, j);
+                        }
+                        j++;
+                    } else {
+                        swap(numbers, i + 1, high);
+                        const pi = i + 1;
+                        if (pi - 1 > low) {
+                            stack.push([low, pi - 1]);
+                        }
+                        if (pi + 1 < high) {
+                            stack.push([pi + 1, high]);
+                        }
+                        state = "partition";
+                        renderNumbers([...numbers]);
+                        partition();
+                    }
+                } else if (state === "completed") {
+                    console.log("Sorting completed!");
+                }
+                if (state !== "completed") {
+                    renderNumbers([...numbers]);
+                }
+            };
+
+            const startSorting = () => {
+                const userNumbersInput = document.getElementById("user-numbers").value;
+                const userNumbers = userNumbersInput.split(",").map(Number).filter((n) => !isNaN(n));
+
+                if (userNumbers.length < 5 || userNumbers.length > 10) {
+                    alert("Please enter between 5 and 10 valid numbers.");
+                    return;
+                }
+
+                numbers = userNumbers;
+                stack.push([0, numbers.length - 1]);
+                renderNumbers([...numbers]);
+                document.getElementById("start-button").style.display = 'none'; // Hide Start Sorting button
+                document.getElementById("next-step-button").style.display = 'inline-block'; // Show Next Step button
+                document.getElementById("next-step-button").disabled = false;
+            };
+
+            document.getElementById("start-button").addEventListener("click", startSorting);
+
+            document.getElementById("next-step-button").addEventListener("click", () => {
+                if (state === "partition") {
+                    partition();
+                } else {
+                    nextStep();
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+  const toggleButton = document.querySelector(".dark-toggle-button");
+
+  // Function to toggle theme and icon
+  const toggleTheme = () => {
+    const body = document.body;
+    const isDarkMode = body.classList.contains("dark-mode");
+
+    // Update class and icon based on current mode
+    body.classList.toggle("dark-mode");
+    toggleButton.classList.toggle("fa-sun", !isDarkMode); // Add sun icon in light mode
+    toggleButton.classList.toggle("fa-moon", isDarkMode); // Add moon icon in dark mode
+  };
+
+  // Add click event listener for responsiveness
+  toggleButton.addEventListener("click", toggleTheme);
+
+  // Set initial state based on existing class
+  if (document.body.classList.contains("dark-mode")) {
+    toggleButton.classList.add("fa-sun"); // Add moon icon if dark mode on page load
+  } else {
+    toggleButton.classList.add("fa-moon"); // Add sun icon if light mode on page load
+  }
+});
+
+        // New code for animation delays
+        document.addEventListener("DOMContentLoaded", () => {
+            const titleLetters = document.querySelectorAll(".navbar-brand span");
+
+            // Assign animation delays
+            titleLetters.forEach((letter, index) => {
+                letter.style.setProperty('--delay', index); // Set a CSS variable for delay
+            });
+        });
+
+        function validateInput() {
+            const inputField = document.getElementById("user-numbers");
+            const inputValue = inputField.value.trim();
+
+            // Regular expression to allow digits (0-9) and commas (,)
+            const validCharactersRegex = /^[0-9,\s]*$/;
+
+            // Check if the input value contains invalid characters
+            if (!validCharactersRegex.test(inputValue)) {
+                // Show an alert message for invalid characters
+                alert("Please enter only numbers separated by commas.");
+                
+                // Remove invalid characters from the input field
+                inputField.value = inputValue.replace(/[^0-9,]/g, '');
             }
-            stepContainer.appendChild(numberDiv);
-          });
-          const sortingStepsContainer = document.getElementById(
-            "sorting-steps-container"
-          );
-          sortingStepsContainer.appendChild(stepContainer);
-
-          // Automatically scroll to the bottom of the container
-          sortingStepsContainer.scrollTop = sortingStepsContainer.scrollHeight;
-        };
-
-        // Function to display completion message
-        const displayCompletionMessage = () => {
-          const messageDiv = document.getElementById("completion-message");
-          messageDiv.textContent = "Sorting is complete!";
-          messageDiv.className = "alert alert-success";
-        };
-
-        // Function to swap elements in an array
-        const swap = (arr, i, j) => {
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        };
-
-        // Function for the partitioning step of QuickSort
-        const partition = () => {
-          if (stack.length > 0) {
-            [low, high] = stack.pop();
-            pivot = high;
-            i = low - 1;
-            j = low;
-            state = "partitioning";
-          } else {
-            state = "completed";
-            renderNumbers([...numbers]); // Final rendering of sorted numbers
-            displayCompletionMessage(); // Display completion message
-            document.getElementById("start-button").disabled = true;
-          }
-        };
-
-        // Function to execute the next step in the sorting process
-        const nextStep = () => {
-          if (state === "partitioning") {
-            if (j < high) {
-              if (numbers[j] < numbers[pivot]) {
-                i++;
-                swap(numbers, i, j);
-              }
-              j++;
-            } else {
-              swap(numbers, i + 1, high);
-              const pi = i + 1;
-              if (pi - 1 > low) {
-                stack.push([low, pi - 1]);
-              }
-              if (pi + 1 < high) {
-                stack.push([pi + 1, high]);
-              }
-              state = "partition";
-              renderNumbers([...numbers]); // Render numbers after pivot swap
-              partition(); // Move to the next partition
-            }
-          } else if (state === "completed") {
-            console.log("Sorting completed!");
-          }
-          if (state !== "completed") {
-            renderNumbers([...numbers]);
-          }
-        };
-
-        // Function to validate and start the sorting process
-        const startSorting = () => {
-          const userNumbersInput =
-            document.getElementById("user-numbers").value;
-          const userNumbers = userNumbersInput
-            .split(",")
-            .map(Number)
-            .filter((n) => !isNaN(n));
-
-          if (userNumbers.length < 5 || userNumbers.length > 10) {
-            alert("Please enter between 5 and 10 valid numbers.");
-            return;
-          }
-
-          numbers = userNumbers;
-          stack.push([0, numbers.length - 1]); // Initialize stack with initial partition
-          renderNumbers([...numbers]); // Initial rendering of numbers
-          document.getElementById("next-step-button").disabled = false; // Enable the Next Step button
-        };
-
-        // Event listener for the Start button
-        document
-          .getElementById("start-button")
-          .addEventListener("click", startSorting);
-
-        // Event listener for the Next Step button
-        document
-          .getElementById("next-step-button")
-          .addEventListener("click", () => {
-            if (state === "partition") {
-              partition();
-            } else {
-              nextStep();
-            }
-          });
-      });
+        }
     </script>
-  </body>
+    
+</body>
 </html>
