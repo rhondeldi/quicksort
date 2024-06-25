@@ -154,6 +154,7 @@
             state = "completed";
             renderNumbers([...numbers]); // Final rendering of sorted numbers
             displayCompletionMessage(); // Display completion message
+            document.getElementById("start-button").disabled = true;
           }
         };
 
