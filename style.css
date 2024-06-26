@@ -1,0 +1,313 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  transition: background-color 0.5s, color 0.5s;
+  overflow-x: hidden; /* Ensure no horizontal scroll */
+}
+body.light-mode {
+  background-color: #f0f0f0;
+  color: #000;
+}
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+body.dark-mode .navbar-brand {
+  color: #bb86fc;
+  text-shadow: 0 0 10px #bb86fc;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative; /* Ensure stacking context for z-index */
+  z-index: 1; /* Ensure it's above the background */
+}
+.scrollable-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  width: 100%;
+}
+.number-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.number-box {
+  border: 2px solid transparent;
+  padding: 10px;
+  margin: 5px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s,
+    transform 0.3s;
+}
+.bg-primary {
+  background-color: transparent !important; /* Make sure background is transparent */
+  border-color: black; /* Keep border color */
+  color: #000; /* Keep text color */
+}
+.bg-pivot {
+  background-color: #ff9800;
+  color: #fff;
+}
+.bg-i {
+  background-color: blue;
+  color: #fff;
+}
+.bg-j {
+  background-color: #f44336;
+  color: #fff;
+}
+.bg-completed {
+  background-color: #8bc34a;
+  color: #fff;
+}
+body.dark-mode .bg-primary {
+  border-color: white;
+  background-color: transparent;
+  color: #e0e0e0;
+}
+body.dark-mode .bg-pivot {
+  border-color: #ffb74d;
+  background-color: transparent;
+  box-shadow: 0 0 10px #ffb74d;
+}
+body.dark-mode .bg-i {
+  border-color: blue;
+  background-color: transparent;
+  box-shadow: 0 0 10px blue;
+}
+body.dark-mode .bg-j {
+  border-color: #e57373;
+  background-color: transparent;
+  box-shadow: 0 0 10px #e57373;
+}
+body.dark-mode .bg-completed {
+  border-color: #aed581;
+  background-color: transparent;
+  box-shadow: 0 0 10px #aed581;
+}
+.number-box.swap {
+  animation: swap 0.3s;
+}
+.title {
+  font-size: 200px; /* Adjust font size as needed */
+  display: inline-block; /* Allows individual letter manipulation */
+  position: relative; /* Enables letter transformations */
+}
+
+.title span {
+  display: inline-block; /* Allows individual letter positioning */
+  position: relative; /* Enables letter transformations for individual spans */
+  margin-right: 100px; /* Optional spacing between letters */
+}
+
+.title span:nth-child(odd) {
+  animation: swap-left 1s ease-in-out infinite alternate;
+}
+
+.title span:nth-child(even) {
+  animation: swap-right 1s ease-in-out infinite alternate;
+}
+
+@keyframes swap-left {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(30px); /* Adjust distance based on font size */
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes swap-right {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px); /* Adjust distance based on font size */
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.navbar-brand span {
+  display: inline-block;
+  animation: swap 0.5s infinite;
+  animation-delay: calc(var(--delay) * 0.1s); /* Delay each letter */
+  font-size: calc(1vw + 1rem); /* Responsive font size */
+  padding-bottom: 5%;
+
+  align-items: center;
+  justify-self: center;
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10; /* Ensure button is above galaxy background */
+}
+.legend {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 10px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+.legend-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+.input-group {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+body.dark-mode .form-control,
+body.dark-mode .input-group-append .btn {
+  background-color: transparent;
+  border-color: #bb86fc;
+  color: #e0e0e0;
+  box-shadow: 0 0 10px #bb86fc;
+}
+body.light-mode .form-control,
+body.light-mode .input-group-append .btn {
+  border-color: #000;
+  box-shadow: none;
+}
+
+/* Animation for the title */
+@keyframes titleAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.navbar-brand {
+  animation: titleAnimation 2s infinite;
+}
+/* Galaxy background styles */
+.galaxy-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Ensure it's behind other content */
+  background: url("") center/cover fixed;
+  transition: filter 0.5s ease; /* Smooth transition for filters */
+}
+
+/* Adjustments for dark mode on galaxy background */
+body.dark-mode .galaxy-container {
+  filter: brightness(70%) contrast(130%);
+}
+
+/* Glowing effect animation */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.btn {
+  background-color: transparent;
+  transition: transform 0.5s;
+}
+
+.btn-glow {
+  animation: glow 4s infinite;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  transition: transform 0.5s;
+}
+#start-button {
+  color: #f0f0f0;
+  background-color: #5d3fd3;
+  border: none; /* Remove default button border */
+  font-size: 16px; /* Adjust font size for readability */
+  cursor: pointer; /* Set cursor to indicate clickability */
+  transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+}
+
+#start-button:hover {
+  background-color: #4a2baa; /* Slightly darker shade on hover */
+  transform: scale(1.05); /* Subtle zoom effect on hover */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow on hover */
+}
+
+#start-button:active {
+  transform: scale(); /* Slight shrink effect on click */
+  box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.3); /* Inset shadow on click */
+}
+#next-step-button {
+  color: #f0f0f0;
+  background-color: #5d3fd3;
+  border: none; /* Remove default button border */
+  font-size: 16px; /* Adjust font size for readability */
+  cursor: pointer; /* Set cursor to indicate clickability */
+  transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+}
+
+#next-step-button:hover {
+  background-color: #4a2baa; /* Slightly darker shade on hover */
+  transform: scale(1.05); /* Subtle zoom effect on hover */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Add subtle shadow on hover */
+}
+
+#next-step-button:active {
+  transform: scale(); /* Slight shrink effect on click */
+  box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.3); /* Inset shadow on click */
+}
+.btn-outline-secondary:hover .btn-glow {
+  animation: glow 1s infinite;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  transform: scale(1.1);
+}
+
+.btn-primary:hover .btn-glow {
+  animation: glow 1s infinite;
+}
+.moon-icon,
+.sun-icon {
+  display: none;
+}
+
+.toggle-button.dark-mode .sun-icon {
+  display: inline-block;
+}
+
+.toggle-button.light-mode .moon-icon {
+  display: inline-block;
+}
