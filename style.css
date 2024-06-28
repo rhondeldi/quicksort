@@ -311,3 +311,19 @@ body.dark-mode .galaxy-container {
 .toggle-button.light-mode .moon-icon {
   display: inline-block;
 }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  background-color: transparent; /* Ensures it blends with the background */
+  color: #4a2baa;
+  font-size: 14px; /* Adjust the font size as needed */
+  transition: background-color 0.5s, color 0.5s; /* Smooth transition for theme change */
+}
+
+body.dark-mode .footer {
+  color: #e0e0e0; /* Color for dark mode */
+}

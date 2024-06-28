@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("start-button").style.display = "none"; // Hide Start Sorting button
     document.getElementById("next-step-button").style.display = "inline-block"; // Show Next Step button
     document.getElementById("next-step-button").disabled = false;
+    document.getElementById("footer").style.display = "none";
   };
 
   document
