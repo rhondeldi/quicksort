@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageDiv = document.getElementById("completion-message");
     messageDiv.textContent = "SORTING IS COMPLETE!";
     messageDiv.className = "alert alert-success";
+
+    showResetButton();
   };
 
   const swap = (arr, i, j) => {
@@ -127,6 +129,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+const showResetButton = () => {
+  const buttonEl = document.getElementById("next-step-button");
+
+  // Change button text
+  buttonEl.innerText = "Reset";
+
+  // If button clicked, refresh page
+  buttonEl.addEventListener("click", () => {
+    location.reload();
+  })
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const toggleButton = document.querySelector(".dark-toggle-button");
